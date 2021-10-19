@@ -1,5 +1,6 @@
 package fhs.mmt.nma.pixie.ui.theme
 
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -26,3 +27,5 @@ private val Nunito = FontFamily(
         ),
     )
 )
+
+
