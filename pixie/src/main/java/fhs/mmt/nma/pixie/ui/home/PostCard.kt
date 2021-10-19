@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.Comment
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import fhs.mmt.nma.pixie.data.Comment
 import fhs.mmt.nma.pixie.ui.theme.*
 
 
@@ -82,8 +83,44 @@ fun PostCard(post: Post) {
                     Text("${post.comments.size}", modifier = Modifier.padding(start = 8.dp))
                 }
             }
+        CommentSection(comments = post.comments)
     }
 }
+
+@Composable
+fun CommentSection(comments: List<Comment>) {
+    //val opened = remember {mutableStateOf(false)}
+
+    if(comments.isNotEmpty()) {
+        Column {
+            Comment(comment = comments[comments.size-1])
+            if(comments.size > 1) {
+                Comment(comment = comments[comments.size-2])
+            }
+            TextButton(onClick = { /*ShowAllComments(comments = comments*/ }) {
+                Text("Show all ${comments.size} comments")
+            }
+        }
+    }
+}
+
+@Composable
+fun Comment(comment: Comment) {
+    Row {
+        Text(text = "${comment.author.name}", modifier = Modifier
+            .width(width = 70.dp))
+        Text(text = "${comment.message}", modifier = Modifier
+            .width(width = 230.dp))
+    }
+}
+
+@Composable
+fun ShowAllComments(comments: List<Comment>) {
+    for (element in comments) {
+        Comment(element)
+    }
+}
+
 
 
 
