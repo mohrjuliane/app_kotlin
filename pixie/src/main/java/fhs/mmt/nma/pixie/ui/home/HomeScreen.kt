@@ -1,6 +1,7 @@
 package fhs.mmt.nma.pixie.ui.home
 
 import android.content.res.Configuration
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import fhs.mmt.nma.pixie.data.Post
@@ -11,6 +12,8 @@ import fhs.mmt.nma.pixie.ui.theme.PixieTheme
 fun HomeScreen(posts: List<Post> = AllPosts) {
     //TODO: Display all posts as list
     PostCard(post = posts.first())
+
+
 }
 
 @Preview

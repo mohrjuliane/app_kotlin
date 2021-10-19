@@ -1,9 +1,14 @@
 package fhs.mmt.nma.pixie
 
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import fhs.mmt.nma.pixie.data.*
+import fhs.mmt.nma.pixie.samples.providers.PostSampleProvider
 import fhs.mmt.nma.pixie.ui.home.PostCard
 import fhs.mmt.nma.pixie.ui.home.PostPreview
 import fhs.mmt.nma.pixie.ui.theme.PixieTheme
@@ -33,7 +38,9 @@ class PostCardComponent : ComponentActivity() {
 
                 val post1 = Post(photos = photos, author = me, likes = 10, comments = commentList)
                 PostPreview(post = post1)
+
             }
         }
     }
 }
+

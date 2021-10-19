@@ -12,6 +12,16 @@ import fhs.mmt.nma.pixie.ui.theme.PixieTheme
 @Composable
 fun PostCard(post: Post) {
    Text(text = "TODO $post")
+    Row {
+        Box(modifier = Modifier
+            .size(size = 48.dp)
+            .clip(shape = CircleShape)
+            .background(color = Color.LightGray)
+        )
+        Column {
+            Text("Juliane Mohr")
+        }
+    }
 }
 
 @Preview
