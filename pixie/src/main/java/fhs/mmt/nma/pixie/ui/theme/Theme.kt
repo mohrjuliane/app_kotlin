@@ -11,7 +11,6 @@ import androidx.compose.ui.graphics.Color
 @Composable
 fun PixieTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable() () -> Unit) {
     MaterialTheme(
-        //MaterialTheme.colors.primary
         colors = if (darkTheme) darkColors(
             primary = Color(0xFFBB86FC),
             primaryVariant = Color(0xFF3700B3),

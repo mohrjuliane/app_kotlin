@@ -1,6 +1,7 @@
 package fhs.mmt.nma.pixie.ui.home
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.material.Text
@@ -19,24 +20,22 @@ import androidx.compose.material.icons.filled.Comment
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberImagePainter
 import fhs.mmt.nma.pixie.data.Comment
 import fhs.mmt.nma.pixie.data.Photographer
 import fhs.mmt.nma.pixie.ui.theme.*
-import java.time.format.TextStyle
 
 
 @Composable
 fun PostCard(post: Post) {
     Column(modifier = Modifier
-        .background(color = MaterialTheme.colors.background)) {
+        .background(color = MaterialTheme.colors.surface)) {
         AuthorSection(author = post.author)
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(height = 400.dp)
-                .background(color = MaterialTheme.colors.onBackground)
-        )
+        Image(painter = rememberImagePainter(post.photos.first().url), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier
+            .aspectRatio(4.0f / 3.0f)
+            .fillMaxWidth())
         ActionSection(likes = post.likes, commentsCount = post.comments.size)
         CommentSection(comments = post.comments)
     }
@@ -84,13 +83,15 @@ fun AuthorSection(author: Photographer) {
     Row(modifier = Modifier
         .padding(top = 8.dp, bottom = 8.dp)
         .fillMaxWidth()) {
-        Box(
+        Image(
+            painter = rememberImagePainter(author.picture),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
             modifier = Modifier
-                .padding(start = 8.dp, end = 8.dp)
-                .size(size = 48.dp)
+                .size(width = 48.dp, height = 48.dp)
                 .clip(shape = CircleShape)
-                .background(color = MaterialTheme.colors.secondary)
-                .border(width = 1.5.dp, color = MaterialTheme.colors.primary, shape = CircleShape)
+                .fillMaxSize()
+                .border(width = (1.5).dp, color = MaterialTheme.colors.primary, CircleShape)
         )
         Column(
             modifier = Modifier
@@ -110,7 +111,7 @@ fun CommentSection(comments: List<Comment>) {
     //val opened = remember {mutableStateOf(false)}
 
     if(comments.isNotEmpty()) {
-        Column {
+        Column(modifier = Modifier.padding( start = 16.dp, end = 16.dp)) {
             Comment(comment = comments[comments.size-1])
             if(comments.size > 1) {
                 Comment(comment = comments[comments.size-2])
@@ -125,10 +126,10 @@ fun CommentSection(comments: List<Comment>) {
 @Composable
 fun Comment(comment: Comment) {
     Row {
-        Text(text = "${comment.author.name}", style = MaterialTheme.typography.h2, color = MaterialTheme.colors.onBackground, modifier = Modifier
-            .width(width = 70.dp))
+        Text(text = "${comment.author.name}", style = MaterialTheme.typography.h2, color = MaterialTheme.colors.onBackground)
         Text(text = "${comment.message}", style = MaterialTheme.typography.body2, color = MaterialTheme.colors.onBackground, modifier = Modifier
-            .width(width = 230.dp))
+            .fillMaxWidth()
+            .padding(start = 8.dp, bottom = 10.dp))
     }
 }
 
