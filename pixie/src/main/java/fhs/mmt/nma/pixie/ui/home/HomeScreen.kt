@@ -19,13 +19,14 @@ import fhs.mmt.nma.pixie.ui.theme.PixieTheme
 
 @Composable
 fun HomeScreen(posts: List<Post> = AllPosts) {
-    Column(modifier = Modifier.background(MaterialTheme.colors.background)) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.background(MaterialTheme.colors.background)) {
         TopAppBar(title = {Text("Pixie",style = MaterialTheme.typography.h1, color = MaterialTheme.colors.onBackground)}, backgroundColor = MaterialTheme.colors.surface)
-        LazyColumn(modifier = Modifier
-            .background(color = MaterialTheme.colors.background)) {
+        LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier
+            .background(color = MaterialTheme.colors.background)
+            .padding(start = 8.dp, end = 8.dp)) {
 
             items(posts) { currentPost ->
-                Card(modifier = Modifier.padding(end = 8.dp, start = 8.dp, top = 8.dp)) {
+                Card {
                     PostCard(post = currentPost)
                 }
 

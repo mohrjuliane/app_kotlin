@@ -34,8 +34,9 @@ fun PostCard(post: Post) {
         .background(color = MaterialTheme.colors.surface)) {
         AuthorSection(author = post.author)
         Image(painter = rememberImagePainter(post.photos.first().url), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier
+            .fillMaxWidth()
             .aspectRatio(4.0f / 3.0f)
-            .fillMaxWidth())
+            )
         ActionSection(likes = post.likes, commentsCount = post.comments.size)
         CommentSection(comments = post.comments)
     }
@@ -92,6 +93,7 @@ fun AuthorSection(author: Photographer) {
                 .clip(shape = CircleShape)
                 .fillMaxSize()
                 .border(width = (1.5).dp, color = MaterialTheme.colors.primary, CircleShape)
+                .padding(start = 8.dp, end = 8.dp)
         )
         Column(
             modifier = Modifier
