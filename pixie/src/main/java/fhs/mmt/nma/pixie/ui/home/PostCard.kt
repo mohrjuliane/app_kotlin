@@ -8,6 +8,7 @@ import androidx.compose.material.Text
 import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.runtime.Composable
@@ -26,10 +27,13 @@ import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
+import androidx.compose.ui.Alignment.Companion.End
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import coil.compose.ImagePainter
 import coil.compose.rememberImagePainter
 import com.google.accompanist.pager.*
@@ -58,29 +62,48 @@ fun PostCard(post: Post) {
 
                     is ImagePainter.State.Loading ->  Box(modifier = Modifier
                         .fillMaxWidth()
-                        .aspectRatio(4.0f / 3.0f), contentAlignment = Center){
+                        .aspectRatio(4.0f / 3.0f),
+                        contentAlignment = Center){
                         CircularProgressIndicator()
                     }
                     is ImagePainter.State.Success -> {
-
-
                     }
-                    is ImagePainter.State.Error -> Box(modifier = Modifier.fillMaxWidth()
-                        .aspectRatio(4.0f / 3.0f),
+                    is ImagePainter.State.Error -> Box(modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(4.0f / 3.0f)
+                        .background(Color(0xFFECECEC)),
                     contentAlignment = Center) {
                         Icon(
                             imageVector = Icons.Default.NoPhotography,
-                            contentDescription = "Error"
+                            contentDescription = "Error",
+                            modifier = Modifier.size(24.dp)
                         )
                     }
                     is ImagePainter.State.Empty -> Box(modifier = Modifier
                         .fillMaxWidth()
+                        .background(Color(0xFFECECEC))
                         .aspectRatio(4.0f / 3.0f), contentAlignment = Center){
-                        Icon(imageVector = Icons.Default.CameraAlt, contentDescription = "Empty image")
+                        Icon(imageVector = Icons.Default.CameraAlt, contentDescription = "Empty image",
+                            modifier = Modifier.size(24.dp))
                     }
             }
 
             Column {
+                if(pagerState.pageCount > 1) {
+                    Box(modifier = Modifier
+                        .absoluteOffset(y = 40.dp)
+                        .padding(end = 8.dp)
+                        .zIndex(2F)
+                        .clip(
+                            RoundedCornerShape(topEnd = 14.dp, topStart = 14.dp, bottomEnd = 14.dp, bottomStart = 14.dp)
+                        )
+
+                        .background(MaterialTheme.colors.secondary)
+                        .padding(all = 8.dp)
+                        .align(alignment = End)){
+                        Text(text = "${pagerState.currentPage+1} / ${pagerState.pageCount}", style = MaterialTheme.typography.caption)
+                    }
+                }
                 Image(painter = painter, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(4.0f / 3.0f)
