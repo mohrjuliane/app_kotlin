@@ -16,32 +16,64 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import fhs.mmt.nma.pixie.data.Post
 import fhs.mmt.nma.pixie.samples.providers.PostSampleProvider
 import androidx.compose.material.Icon
+import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Comment
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.NoPhotography
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Bottom
+import androidx.compose.ui.Alignment.Companion.BottomCenter
+import androidx.compose.ui.Alignment.Companion.Center
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.unit.dp
+import coil.compose.ImagePainter
 import coil.compose.rememberImagePainter
+import com.google.accompanist.pager.*
 import fhs.mmt.nma.pixie.data.Comment
 import fhs.mmt.nma.pixie.data.Photographer
 import fhs.mmt.nma.pixie.ui.theme.*
+import org.intellij.lang.annotations.JdkConstants
 
-
+@ExperimentalPagerApi
 @Composable
 fun PostCard(post: Post) {
+    val pagerState = rememberPagerState()
+
+
+
     Column(modifier = Modifier
         .background(color = MaterialTheme.colors.surface)) {
         AuthorSection(author = post.author)
-        Image(painter = rememberImagePainter(post.photos.first().url), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier
-            .fillMaxWidth()
-            .aspectRatio(4.0f / 3.0f)
-            )
+        HorizontalPager(count = post.photos.size, state = pagerState) { page ->
+            Column(verticalArrangement = Arrangement.Center, modifier = Modifier.fillMaxHeight()) {
+                val painter = rememberImagePainter(post.photos[page].url)
+
+                when(painter.state) {
+                    ImagePainter.State.Empty -> Icon(imageVector = Icons.Default.CameraAlt, contentDescription = "Empty image", modifier = Modifier.align(alignment = CenterHorizontally))
+                    is ImagePainter.State.Loading -> CircularProgressIndicator()
+                    is ImagePainter.State.Success -> { }
+                    is ImagePainter.State.Error -> Icon(imageVector = Icons.Default.NoPhotography, contentDescription = "Error", modifier = Modifier.align(alignment = CenterHorizontally))
+                }
+
+                Image(painter = painter, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(4.0f / 3.0f)
+                )
+                Pagerpoints(pagerState = pagerState)
+
+            }
+        }
+
         ActionSection(likes = post.likes, commentsCount = post.comments.size)
         CommentSection(comments = post.comments)
     }
 }
 
+@ExperimentalPagerApi
 @Composable
 fun ActionSection(likes: Int, commentsCount: Int) {
     Row(modifier = Modifier
@@ -79,10 +111,11 @@ fun ActionSection(likes: Int, commentsCount: Int) {
     }
 }
 
+@ExperimentalPagerApi
 @Composable
 fun AuthorSection(author: Photographer) {
     Row(modifier = Modifier
-        .padding(top = 8.dp, bottom = 8.dp)
+        .padding(start = 8.dp, end = 8.dp, top = 8.dp, bottom = 8.dp)
         .fillMaxWidth()) {
         Image(
             painter = rememberImagePainter(author.picture),
@@ -91,23 +124,25 @@ fun AuthorSection(author: Photographer) {
             modifier = Modifier
                 .size(width = 48.dp, height = 48.dp)
                 .clip(shape = CircleShape)
-                .fillMaxSize()
                 .border(width = (1.5).dp, color = MaterialTheme.colors.primary, CircleShape)
-                .padding(start = 8.dp, end = 8.dp)
         )
         Column(
             modifier = Modifier
-                .height(height = 48.dp), verticalArrangement = Arrangement.Center
+                .height(height = 48.dp)
+                .padding(start = 8.dp),
+            verticalArrangement = Arrangement.Center
+
         ) {
-            Text("${author.name}", color = MaterialTheme.colors.onBackground, style = MaterialTheme.typography.h2)
+            Text(author.name, color = MaterialTheme.colors.onBackground, style = MaterialTheme.typography.h2)
             if(author.location != null) {
-                Text("${author.location}", color = MaterialTheme.colors.onBackground, style = MaterialTheme.typography.body2)
+                Text(author.location, color = MaterialTheme.colors.onBackground, style = MaterialTheme.typography.body2)
             }
         }
     }
 }
 
 
+@ExperimentalPagerApi
 @Composable
 fun CommentSection(comments: List<Comment>) {
     //val opened = remember {mutableStateOf(false)}
@@ -125,16 +160,18 @@ fun CommentSection(comments: List<Comment>) {
     }
 }
 
+@ExperimentalPagerApi
 @Composable
 fun Comment(comment: Comment) {
     Row {
-        Text(text = "${comment.author.name}", style = MaterialTheme.typography.h2, color = MaterialTheme.colors.onBackground)
-        Text(text = "${comment.message}", style = MaterialTheme.typography.body2, color = MaterialTheme.colors.onBackground, modifier = Modifier
+        Text(text = comment.author.name, style = MaterialTheme.typography.h2, color = MaterialTheme.colors.onBackground)
+        Text(text = comment.message, style = MaterialTheme.typography.body2, color = MaterialTheme.colors.onBackground, modifier = Modifier
             .fillMaxWidth()
             .padding(start = 8.dp, bottom = 10.dp))
     }
 }
 
+@ExperimentalPagerApi
 @Composable
 fun ShowAllComments(comments: List<Comment>) {
     for (element in comments) {
@@ -142,9 +179,20 @@ fun ShowAllComments(comments: List<Comment>) {
     }
 }
 
+@ExperimentalPagerApi
+@Composable
+fun Pagerpoints(pagerState: PagerState) {
+    Row {
+        for (index in 1..pagerState.pageCount) {
+            Box(modifier = Modifier.height(4.dp).clip(CircleShape).background(MaterialTheme.colors.secondary))
+        }
+    }
+
+}
 
 
 
+@ExperimentalPagerApi
 @Preview
 @Preview(uiMode = UI_MODE_NIGHT_YES)
 @Composable
