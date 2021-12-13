@@ -41,30 +41,55 @@ import org.intellij.lang.annotations.JdkConstants
 @ExperimentalPagerApi
 @Composable
 fun PostCard(post: Post) {
-    val pagerState = rememberPagerState()
+
 
 
 
     Column(modifier = Modifier
         .background(color = MaterialTheme.colors.surface)) {
         AuthorSection(author = post.author)
+
+        val pagerState = rememberPagerState()
         HorizontalPager(count = post.photos.size, state = pagerState) { page ->
-            Column(verticalArrangement = Arrangement.Center, modifier = Modifier.fillMaxHeight()) {
+
                 val painter = rememberImagePainter(post.photos[page].url)
 
                 when(painter.state) {
-                    ImagePainter.State.Empty -> Icon(imageVector = Icons.Default.CameraAlt, contentDescription = "Empty image", modifier = Modifier.align(alignment = CenterHorizontally))
-                    is ImagePainter.State.Loading -> CircularProgressIndicator()
-                    is ImagePainter.State.Success -> { }
-                    is ImagePainter.State.Error -> Icon(imageVector = Icons.Default.NoPhotography, contentDescription = "Error", modifier = Modifier.align(alignment = CenterHorizontally))
-                }
 
+                    is ImagePainter.State.Loading ->  Box(modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(4.0f / 3.0f), contentAlignment = Center){
+                        CircularProgressIndicator()
+                    }
+                    is ImagePainter.State.Success -> {
+
+
+                    }
+                    is ImagePainter.State.Error -> Box(modifier = Modifier.fillMaxWidth()
+                        .aspectRatio(4.0f / 3.0f),
+                    contentAlignment = Center) {
+                        Icon(
+                            imageVector = Icons.Default.NoPhotography,
+                            contentDescription = "Error"
+                        )
+                    }
+                    is ImagePainter.State.Empty -> Box(modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(4.0f / 3.0f), contentAlignment = Center){
+                        Icon(imageVector = Icons.Default.CameraAlt, contentDescription = "Empty image")
+                    }
+            }
+
+            Column {
                 Image(painter = painter, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(4.0f / 3.0f)
                 )
-                Pagerpoints(pagerState = pagerState)
-
+                if(pagerState.pageCount > 1) {
+                    HorizontalPagerIndicator(activeColor = MaterialTheme.colors.secondary, pagerState = pagerState, modifier = Modifier
+                        .align(alignment = CenterHorizontally)
+                        .padding(top = 8.dp))
+                }
             }
         }
 
@@ -178,18 +203,6 @@ fun ShowAllComments(comments: List<Comment>) {
         Comment(element)
     }
 }
-
-@ExperimentalPagerApi
-@Composable
-fun Pagerpoints(pagerState: PagerState) {
-    Row {
-        for (index in 1..pagerState.pageCount) {
-            Box(modifier = Modifier.height(4.dp).clip(CircleShape).background(MaterialTheme.colors.secondary))
-        }
-    }
-
-}
-
 
 
 @ExperimentalPagerApi
