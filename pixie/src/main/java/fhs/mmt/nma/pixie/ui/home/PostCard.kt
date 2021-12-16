@@ -46,14 +46,27 @@ import org.intellij.lang.annotations.JdkConstants
 @Composable
 fun PostCard(post: Post) {
 
-
-
-
     Column(modifier = Modifier
         .background(color = MaterialTheme.colors.surface)) {
         AuthorSection(author = post.author)
 
         val pagerState = rememberPagerState()
+
+        if(pagerState.pageCount > 1) {
+            Box(modifier = Modifier
+                .offset(y = 40.dp)
+                .padding(end = 8.dp)
+                .zIndex(2F)
+                .clip(
+                    RoundedCornerShape(topEnd = 14.dp, topStart = 14.dp, bottomEnd = 14.dp, bottomStart = 14.dp)
+                )
+                .background(MaterialTheme.colors.secondary)
+                .padding(all = 8.dp)
+                .align(alignment = End)){
+                Text(text = "${pagerState.currentPage+1} / ${pagerState.pageCount}", style = MaterialTheme.typography.caption)
+            }
+        }
+
         HorizontalPager(count = post.photos.size, state = pagerState) { page ->
 
                 val painter = rememberImagePainter(post.photos[page].url)
@@ -89,31 +102,17 @@ fun PostCard(post: Post) {
             }
 
             Column {
-                if(pagerState.pageCount > 1) {
-                    Box(modifier = Modifier
-                        .absoluteOffset(y = 40.dp)
-                        .padding(end = 8.dp)
-                        .zIndex(2F)
-                        .clip(
-                            RoundedCornerShape(topEnd = 14.dp, topStart = 14.dp, bottomEnd = 14.dp, bottomStart = 14.dp)
-                        )
-
-                        .background(MaterialTheme.colors.secondary)
-                        .padding(all = 8.dp)
-                        .align(alignment = End)){
-                        Text(text = "${pagerState.currentPage+1} / ${pagerState.pageCount}", style = MaterialTheme.typography.caption)
-                    }
-                }
                 Image(painter = painter, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(4.0f / 3.0f)
                 )
-                if(pagerState.pageCount > 1) {
-                    HorizontalPagerIndicator(activeColor = MaterialTheme.colors.secondary, pagerState = pagerState, modifier = Modifier
-                        .align(alignment = CenterHorizontally)
-                        .padding(top = 8.dp))
-                }
+
             }
+        }
+        if(pagerState.pageCount > 1) {
+            HorizontalPagerIndicator(activeColor = MaterialTheme.colors.secondary, pagerState = pagerState, modifier = Modifier
+                .align(alignment = CenterHorizontally)
+                .padding(top = 8.dp))
         }
 
         ActionSection(likes = post.likes, commentsCount = post.comments.size)
