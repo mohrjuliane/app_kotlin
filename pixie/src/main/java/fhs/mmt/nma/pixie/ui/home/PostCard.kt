@@ -4,6 +4,7 @@ import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.material.Text
 import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.layout.*
@@ -22,98 +23,121 @@ import androidx.compose.material.icons.filled.Comment
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.NoPhotography
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.Bottom
-import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.Center
-import androidx.compose.ui.Alignment.Companion.CenterHorizontally
-import androidx.compose.ui.Alignment.Companion.CenterVertically
-import androidx.compose.ui.Alignment.Companion.End
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import coil.compose.ImagePainter
 import coil.compose.rememberImagePainter
 import com.google.accompanist.pager.*
 import fhs.mmt.nma.pixie.data.Comment
 import fhs.mmt.nma.pixie.data.Photographer
 import fhs.mmt.nma.pixie.ui.theme.*
-import org.intellij.lang.annotations.JdkConstants
 
 @ExperimentalPagerApi
 @Composable
-fun PostCard(post: Post) {
+fun PostCard(post: Post, navController: NavController) {
 
     Column(modifier = Modifier
         .background(color = MaterialTheme.colors.surface)) {
-        AuthorSection(author = post.author)
+        AuthorSection(author = post.author, navController)
 
         val pagerState = rememberPagerState()
-
-        if(pagerState.pageCount > 1) {
-            Box(modifier = Modifier
-                .offset(y = 40.dp)
-                .padding(end = 8.dp)
-                .zIndex(2F)
-                .clip(
-                    RoundedCornerShape(topEnd = 14.dp, topStart = 14.dp, bottomEnd = 14.dp, bottomStart = 14.dp)
-                )
-                .background(MaterialTheme.colors.secondary)
-                .padding(all = 8.dp)
-                .align(alignment = End)){
-                Text(text = "${pagerState.currentPage+1} / ${pagerState.pageCount}", style = MaterialTheme.typography.caption)
+        Box {
+            if (pagerState.pageCount > 1) {
+                Box(
+                    modifier = Modifier
+                        .align(alignment = Alignment.TopEnd)
+                        .offset(x = (-8).dp, y = 8.dp)
+                        .zIndex(2F)
+                        .clip(
+                            RoundedCornerShape(
+                                topEnd = 14.dp,
+                                topStart = 14.dp,
+                                bottomEnd = 14.dp,
+                                bottomStart = 14.dp
+                            )
+                        )
+                        .background(MaterialTheme.colors.secondary)
+                        .padding(all = 8.dp)
+                ) {
+                    Text(
+                        text = "${pagerState.currentPage + 1} / ${pagerState.pageCount}",
+                        style = MaterialTheme.typography.caption
+                    )
+                }
             }
-        }
 
-        HorizontalPager(count = post.photos.size, state = pagerState) { page ->
+            HorizontalPager(count = post.photos.size, state = pagerState) { page ->
 
                 val painter = rememberImagePainter(post.photos[page].url)
 
-                when(painter.state) {
+                when (painter.state) {
 
-                    is ImagePainter.State.Loading ->  Box(modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(4.0f / 3.0f),
-                        contentAlignment = Center){
+                    is ImagePainter.State.Loading -> Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(4.0f / 3.0f),
+                        contentAlignment = Center
+                    ) {
                         CircularProgressIndicator()
                     }
                     is ImagePainter.State.Success -> {
                     }
-                    is ImagePainter.State.Error -> Box(modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(4.0f / 3.0f)
-                        .background(Color(0xFFECECEC)),
-                    contentAlignment = Center) {
+                    is ImagePainter.State.Error -> Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(4.0f / 3.0f)
+                            .background(Color(0xFFECECEC)),
+                        contentAlignment = Center
+                    ) {
                         Icon(
                             imageVector = Icons.Default.NoPhotography,
                             contentDescription = "Error",
                             modifier = Modifier.size(24.dp)
                         )
                     }
-                    is ImagePainter.State.Empty -> Box(modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color(0xFFECECEC))
-                        .aspectRatio(4.0f / 3.0f), contentAlignment = Center){
-                        Icon(imageVector = Icons.Default.CameraAlt, contentDescription = "Empty image",
-                            modifier = Modifier.size(24.dp))
+                    is ImagePainter.State.Empty -> Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color(0xFFECECEC))
+                            .aspectRatio(4.0f / 3.0f), contentAlignment = Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.CameraAlt,
+                            contentDescription = "Empty image",
+                            modifier = Modifier.size(24.dp)
+                        )
                     }
-            }
+                }
 
-            Column {
-                Image(painter = painter, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(4.0f / 3.0f)
+                Column {
+                    Image(
+                        painter = painter,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(4.0f / 3.0f)
+                    )
+
+                }
+            }
+        }
+            if (pagerState.pageCount > 1) {
+                HorizontalPagerIndicator(
+                    activeColor = MaterialTheme.colors.secondary,
+                    pagerState = pagerState,
+                    modifier = Modifier
+                        .align(alignment = Alignment.CenterHorizontally)
+                        .padding(top = 8.dp)
                 )
-
             }
-        }
-        if(pagerState.pageCount > 1) {
-            HorizontalPagerIndicator(activeColor = MaterialTheme.colors.secondary, pagerState = pagerState, modifier = Modifier
-                .align(alignment = CenterHorizontally)
-                .padding(top = 8.dp))
-        }
+
 
         ActionSection(likes = post.likes, commentsCount = post.comments.size)
         CommentSection(comments = post.comments)
@@ -160,7 +184,8 @@ fun ActionSection(likes: Int, commentsCount: Int) {
 
 @ExperimentalPagerApi
 @Composable
-fun AuthorSection(author: Photographer) {
+fun AuthorSection(author: Photographer, navController: NavController) {
+
     Row(modifier = Modifier
         .padding(start = 8.dp, end = 8.dp, top = 8.dp, bottom = 8.dp)
         .fillMaxWidth()) {
@@ -172,6 +197,9 @@ fun AuthorSection(author: Photographer) {
                 .size(width = 48.dp, height = 48.dp)
                 .clip(shape = CircleShape)
                 .border(width = (1.5).dp, color = MaterialTheme.colors.primary, CircleShape)
+                .clickable(
+                    enabled = true,
+                    onClick = { navController.navigate("profile/${author.id}") })
         )
         Column(
             modifier = Modifier
@@ -180,7 +208,7 @@ fun AuthorSection(author: Photographer) {
             verticalArrangement = Arrangement.Center
 
         ) {
-            Text(author.name, color = MaterialTheme.colors.onBackground, style = MaterialTheme.typography.h2)
+            Text(author.name, modifier = Modifier.clickable(enabled = true, onClick = {navController.navigate("profile/${author.id}")}), color = MaterialTheme.colors.onBackground, style = MaterialTheme.typography.h2)
             if(author.location != null) {
                 Text(author.location, color = MaterialTheme.colors.onBackground, style = MaterialTheme.typography.body2)
             }
@@ -233,7 +261,7 @@ fun ShowAllComments(comments: List<Comment>) {
 @Composable
 fun PostPreview(@PreviewParameter(PostSampleProvider::class) post: Post) {
     PixieTheme {
-        PostCard(post = post)
+        PostCard(post = post, navController = rememberNavController())
     }
 }
 

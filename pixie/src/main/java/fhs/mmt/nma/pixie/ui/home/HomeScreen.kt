@@ -17,6 +17,9 @@ import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.pager.ExperimentalPagerApi
 import java.nio.channels.spi.AbstractSelectableChannel
 
@@ -36,7 +39,10 @@ fun isSelected(selected: Boolean): Color {
 
 @ExperimentalPagerApi
 @Composable
-fun HomeScreen(posts: List<Post> = AllPosts) {
+fun HomeScreen(navController: NavController) {
+
+    val vm : HomeViewModel = viewModel()
+
     Column(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.background(MaterialTheme.colors.background)) {
 
         LazyColumn(
@@ -45,9 +51,9 @@ fun HomeScreen(posts: List<Post> = AllPosts) {
                 .padding(start = 8.dp, end = 8.dp)
         ) {
 
-            items(posts) { currentPost ->
+            items(vm.posts) { currentPost ->
                 Card {
-                    PostCard(post = currentPost)
+                    PostCard(post = currentPost, navController)
                 }
 
             }
@@ -64,7 +70,7 @@ fun HomeScreen(posts: List<Post> = AllPosts) {
 fun HomePreview() {
     PixieTheme {
 
-        HomeScreen()
+        HomeScreen(navController = rememberNavController())
     }
 }
 

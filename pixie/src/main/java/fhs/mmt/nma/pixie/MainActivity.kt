@@ -4,15 +4,26 @@ import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Column
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.google.accompanist.pager.ExperimentalPagerApi
+import fhs.mmt.nma.pixie.data.Photographer
+import fhs.mmt.nma.pixie.data.User
+import fhs.mmt.nma.pixie.samples.AllUsers
+import fhs.mmt.nma.pixie.samples.FakeUsers
+import fhs.mmt.nma.pixie.samples.providers.UserSampleProvider
 import fhs.mmt.nma.pixie.ui.home.HomeScreen
 import fhs.mmt.nma.pixie.ui.home.isSelected
+import fhs.mmt.nma.pixie.ui.profile.ProfileScreen
 import fhs.mmt.nma.pixie.ui.theme.PixieTheme
 
 @ExperimentalPagerApi
@@ -21,6 +32,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             PixieTheme {
+                val navController = rememberNavController()
                 // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background) {
                     Scaffold(
@@ -32,12 +44,35 @@ class MainActivity : ComponentActivity() {
                                     color = MaterialTheme.colors.onBackground
                                 )
                             }, backgroundColor = MaterialTheme.colors.surface)
-                        }, bottomBar = { BottomNavigationBar() }, content = { HomeScreen() }
+                        }, bottomBar = { BottomNavigationBar(navController) }, content = {
+                            NavHost(navController = navController, startDestination = "home") {
+                                composable(route = "home") {
+                                    HomeScreen(navController)
+                                }
+                                composable(
+                                    "profile/{userId}",
+                                    arguments = listOf(navArgument("userId") { type = NavType.StringType })
+                                ) {
+                                    val userId = it.arguments?.getString("userId")
+                                    ProfileScreen(user = GetUserByIndex(AllUsers, userId!!.toInt()), navController, userId.toString())
+                                }
+                            }
+                        }
                     )
                 }
             }
         }
     }
+}
+
+fun GetUserByIndex(users : List<Photographer>, userId: Int) : Photographer{
+    var result : Photographer = users[0]
+    users.forEach { user ->
+        if(user.id == userId) {
+            result = user
+        }
+    }
+    return result
 }
 
 @ExperimentalPagerApi
@@ -55,7 +90,7 @@ val items = listOf("Home", "Search", "Favorite", "Profile", "Settings")
 
 @ExperimentalPagerApi
 @Composable
-fun BottomNavigationBar() {
+fun BottomNavigationBar(navController : NavController) {
     BottomNavigation(backgroundColor = MaterialTheme.colors.surface) {
         BottomNavigationItem(
             icon = {
@@ -66,7 +101,8 @@ fun BottomNavigationBar() {
                 )
             },
             selected = selectedItem == 0,
-            onClick = { selectedItem = 0 }
+            onClick = {
+                navController.navigate("home")}
         )
         BottomNavigationItem(
             icon = {
