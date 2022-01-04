@@ -4,8 +4,11 @@ import android.content.res.Configuration
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -32,38 +35,43 @@ import fhs.mmt.nma.pixie.data.Post
 import fhs.mmt.nma.pixie.samples.AllPosts
 import fhs.mmt.nma.pixie.samples.FakeUsers
 import fhs.mmt.nma.pixie.samples.providers.UserSampleProvider
+import fhs.mmt.nma.pixie.ui.home.PostCard
 import fhs.mmt.nma.pixie.ui.theme.PixieTheme
 
 @ExperimentalFoundationApi
 @Composable
 fun ProfileScreen(user: Photographer, navController: NavController, userId: String) {
-    Column(modifier = Modifier
+    LazyColumn(modifier = Modifier
         .padding(start = 8.dp, end = 8.dp)
         .background(MaterialTheme.colors.background)) {
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 24.dp, bottom = 24.dp)) {
-            Image(
-                painter = rememberImagePainter(user.picture),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(width = 80.dp, height = 80.dp)
-                    .clip(shape = CircleShape)
-                    .border(width = (1.5).dp, color = MaterialTheme.colors.primary, CircleShape)
-            )
-            val counts = GetCounts(user)
-            Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth()) {
-                ProfileInformationCol(upperText = "${counts[0]}", lowerText = "Likes")
-                ProfileInformationCol(upperText = "${counts[1]}", lowerText = "Photos")
-                ProfileInformationCol(upperText = "${counts[2]}", lowerText = "Comments")
+            item {
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 24.dp, bottom = 24.dp)) {
+                Image(
+                    painter = rememberImagePainter(user.picture),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(width = 80.dp, height = 80.dp)
+                        .clip(shape = CircleShape)
+                        .border(width = (1.5).dp, color = MaterialTheme.colors.primary, CircleShape)
+                )
+                val counts = GetCounts(user)
+                Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth()) {
+                    ProfileInformationCol(upperText = "${counts[0]}", lowerText = "Likes")
+                    ProfileInformationCol(upperText = "${counts[1]}", lowerText = "Photos")
+                    ProfileInformationCol(upperText = "${counts[2]}", lowerText = "Comments")
+                }
+
             }
+            Text(text = "${user.name}", color = MaterialTheme.colors.onBackground, style = MaterialTheme.typography.h2)
+            LocationSocialMedia("${user.location}", "${user.instagram}")
+            Text(text = "${user.bio}", color = MaterialTheme.colors.onBackground, style = MaterialTheme.typography.body2)
+            DisplayPosts(user)
 
         }
-        Text(text = "${user.name}", color = MaterialTheme.colors.onBackground, style = MaterialTheme.typography.h2)
-        LocationSocialMedia("${user.location}", "${user.instagram}")
-        Text(text = "${user.bio}", color = MaterialTheme.colors.onBackground, style = MaterialTheme.typography.body2)
-        DisplayPosts(user)
+
     }
 }
 
@@ -73,16 +81,18 @@ fun DisplayPosts(user : Photographer) {
     val posts = AllPosts.filter { post -> post.author == user }
 
     LazyVerticalGrid(
-        cells = GridCells.Fixed(3), contentPadding = PaddingValues(1.dp), modifier = Modifier.padding(top = 16.dp)
+        cells = GridCells.Fixed(3), modifier = Modifier.padding(top = 16.dp)
     ) {
         items(posts.size) { index ->
+
             Image(
                 painter = rememberImagePainter(posts[index].photos[0].url),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(4.0f / 3.0f)
+                    .aspectRatio(1.0f / 1.0f)
+                    .padding(all = (0.5).dp)
             )
         }
     }
