@@ -55,9 +55,7 @@ fun HomeScreen(navController: NavController) {
                 Card {
                     PostCard(post = currentPost, navController)
                 }
-
             }
-
         }
     }
 }

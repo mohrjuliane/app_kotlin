@@ -8,10 +8,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Card
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddLocation
 import androidx.compose.material.icons.filled.CatchingPokemon
@@ -21,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
@@ -40,38 +38,64 @@ import fhs.mmt.nma.pixie.ui.theme.PixieTheme
 
 @ExperimentalFoundationApi
 @Composable
-fun ProfileScreen(user: Photographer, navController: NavController, userId: String) {
-    LazyColumn(modifier = Modifier
-        .padding(start = 8.dp, end = 8.dp)
-        .background(MaterialTheme.colors.background)) {
+fun ProfileScreen(user: Photographer, navController: NavController) {
+    Column {
+        LazyColumn {
             item {
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 24.dp, bottom = 24.dp)) {
-                Image(
-                    painter = rememberImagePainter(user.picture),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
+                Column(
                     modifier = Modifier
-                        .size(width = 80.dp, height = 80.dp)
-                        .clip(shape = CircleShape)
-                        .border(width = (1.5).dp, color = MaterialTheme.colors.primary, CircleShape)
-                )
-                val counts = GetCounts(user)
-                Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth()) {
-                    ProfileInformationCol(upperText = "${counts[0]}", lowerText = "Likes")
-                    ProfileInformationCol(upperText = "${counts[1]}", lowerText = "Photos")
-                    ProfileInformationCol(upperText = "${counts[2]}", lowerText = "Comments")
+                        .padding(start = 8.dp, end = 8.dp)
+                        .background(MaterialTheme.colors.background)
+                ) {
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 24.dp, bottom = 24.dp)
+                    ) {
+                        Image(
+                            painter = rememberImagePainter(user.picture),
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .size(width = 80.dp, height = 80.dp)
+                                .clip(shape = CircleShape)
+                                .border(
+                                    width = (1.5).dp,
+                                    color = MaterialTheme.colors.primary,
+                                    CircleShape
+                                )
+                        )
+                        val counts = GetCounts(user)
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            ProfileInformationCol(upperText = "${counts[0]}", lowerText = "Likes")
+                            ProfileInformationCol(upperText = "${counts[1]}", lowerText = "Photos")
+                            ProfileInformationCol(
+                                upperText = "${counts[2]}",
+                                lowerText = "Comments"
+                            )
+                        }
+
+                    }
+                    Text(
+                        text = "${user.name}",
+                        color = MaterialTheme.colors.onBackground,
+                        style = MaterialTheme.typography.h2
+                    )
+                    LocationSocialMedia("${user.location}", "${user.instagram}", navController)
+                    Text(
+                        text = "${user.bio}",
+                        color = MaterialTheme.colors.onBackground,
+                        style = MaterialTheme.typography.body2
+                    )
                 }
-
             }
-            Text(text = "${user.name}", color = MaterialTheme.colors.onBackground, style = MaterialTheme.typography.h2)
-            LocationSocialMedia("${user.location}", "${user.instagram}")
-            Text(text = "${user.bio}", color = MaterialTheme.colors.onBackground, style = MaterialTheme.typography.body2)
-            DisplayPosts(user)
-
         }
 
+        DisplayPosts(user)
     }
 }
 
@@ -81,7 +105,7 @@ fun DisplayPosts(user : Photographer) {
     val posts = AllPosts.filter { post -> post.author == user }
 
     LazyVerticalGrid(
-        cells = GridCells.Fixed(3), modifier = Modifier.padding(top = 16.dp)
+        cells = GridCells.Fixed(3), modifier = Modifier.padding(top = 16.dp, start = 8.dp, end = 8.dp)
     ) {
         items(posts.size) { index ->
 
@@ -99,30 +123,33 @@ fun DisplayPosts(user : Photographer) {
 
 }
 
+
 @Composable
-fun LocationSocialMedia(location : String, socialMedia : String) {
+fun LocationSocialMedia(location : String, socialMedia : String, navController: NavController) {
     Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier
         .fillMaxWidth()
         .padding(top = 16.dp, bottom = 16.dp)) {
-        Row() {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
                 imageVector = Icons.Filled.Room,
                 contentDescription = "Location",
                 modifier = Modifier
-                    .size(20.dp)
+                    .size(24.dp)
                     .padding(end = 8.dp)
             )
             Text(text = location, color = MaterialTheme.colors.onBackground, style = MaterialTheme.typography.body1)
         }
-        Row() {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
                 imageVector = Icons.Filled.CatchingPokemon,
                 contentDescription = "Instagram",
                 modifier = Modifier
-                    .size(20.dp)
+                    .size(24.dp)
                     .padding(end = 8.dp)
             )
-            Text(text = socialMedia, color = MaterialTheme.colors.onBackground, style = MaterialTheme.typography.body1)
+            Text(text = socialMedia, color = MaterialTheme.colors.onBackground, style = MaterialTheme.typography.body1,
+                modifier = Modifier
+                    .clickable { navController.navigate(route = "instagram/$socialMedia") })
         }
     }
 }
@@ -162,7 +189,7 @@ fun GetCounts(user : Photographer) : List<String> {
 @Composable
 fun ProfilePreview(@PreviewParameter(UserSampleProvider::class) user: Photographer) {
     PixieTheme {
-        ProfileScreen(user = FakeUsers[0], rememberNavController(), "hallo")
+        ProfileScreen(user = FakeUsers[0], rememberNavController())
     }
 }
 
