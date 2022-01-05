@@ -53,7 +53,7 @@ fun HomeScreen(navController: NavController) {
 
             items(vm.posts) { currentPost ->
                 Card {
-                    PostCard(post = currentPost, navController)
+                    PostCard(post = currentPost, navController, onClick = {vm.onUserClicked(currentPost.author, navController)})
                 }
             }
         }

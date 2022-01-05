@@ -24,6 +24,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberImagePainter
@@ -33,12 +34,14 @@ import fhs.mmt.nma.pixie.data.Post
 import fhs.mmt.nma.pixie.samples.AllPosts
 import fhs.mmt.nma.pixie.samples.FakeUsers
 import fhs.mmt.nma.pixie.samples.providers.UserSampleProvider
+import fhs.mmt.nma.pixie.ui.home.HomeViewModel
 import fhs.mmt.nma.pixie.ui.home.PostCard
 import fhs.mmt.nma.pixie.ui.theme.PixieTheme
 
 @ExperimentalFoundationApi
 @Composable
 fun ProfileScreen(user: Photographer, navController: NavController) {
+
     Column {
         LazyColumn {
             item {

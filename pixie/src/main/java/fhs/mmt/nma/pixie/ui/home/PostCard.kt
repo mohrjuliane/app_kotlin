@@ -40,11 +40,11 @@ import fhs.mmt.nma.pixie.ui.theme.*
 
 @ExperimentalPagerApi
 @Composable
-fun PostCard(post: Post, navController: NavController) {
+fun PostCard(post: Post, navController: NavController, onClick: () -> Unit ) {
 
     Column(modifier = Modifier
         .background(color = MaterialTheme.colors.surface)) {
-        AuthorSection(author = post.author, navController)
+        AuthorSection(author = post.author, navController, onClick)
 
         val pagerState = rememberPagerState()
         Box {
@@ -184,7 +184,7 @@ fun ActionSection(likes: Int, commentsCount: Int) {
 
 @ExperimentalPagerApi
 @Composable
-fun AuthorSection(author: Photographer, navController: NavController) {
+fun AuthorSection(author: Photographer, navController: NavController, onClick: () -> Unit) {
 
     Row(modifier = Modifier
         .padding(start = 8.dp, end = 8.dp, top = 8.dp, bottom = 8.dp)
@@ -199,7 +199,7 @@ fun AuthorSection(author: Photographer, navController: NavController) {
                 .border(width = (1.5).dp, color = MaterialTheme.colors.primary, CircleShape)
                 .clickable(
                     enabled = true,
-                    onClick = { navController.navigate("profile/${author.id}") })
+                    onClick = { onClick })
         )
         Column(
             modifier = Modifier
@@ -228,7 +228,7 @@ fun CommentSection(comments: List<Comment>) {
             if(comments.size > 1) {
                 Comment(comment = comments[comments.size-2])
             }
-            TextButton(onClick = { /*ShowAllComments(comments = comments*/ }) {
+            TextButton(onClick = { /*TODO*/ }) {
                 Text("Show all ${comments.size} comments", style = MaterialTheme.typography.button)
             }
         }
@@ -247,21 +247,12 @@ fun Comment(comment: Comment) {
 }
 
 @ExperimentalPagerApi
-@Composable
-fun ShowAllComments(comments: List<Comment>) {
-    for (element in comments) {
-        Comment(element)
-    }
-}
-
-
-@ExperimentalPagerApi
 @Preview
 @Preview(uiMode = UI_MODE_NIGHT_YES)
 @Composable
 fun PostPreview(@PreviewParameter(PostSampleProvider::class) post: Post) {
     PixieTheme {
-        PostCard(post = post, navController = rememberNavController())
+        PostCard(post = post, navController = rememberNavController(), onClick = {})
     }
 }
 

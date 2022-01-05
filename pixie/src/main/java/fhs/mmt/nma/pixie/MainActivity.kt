@@ -64,10 +64,9 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable(route = "instagram", arguments = listOf(navArgument("userId") {type = NavType.StringType}), deepLinks = listOf(
-                            navDeepLink { uriPattern = "https://www.instagram.com/{userId}" },
-                            navDeepLink { uriPattern = "pixie://{userId}" },
+                            navDeepLink { uriPattern = "httwww.ps://www.instagram.com/mohrjuliane" }
                         )) { 
-                            
+
                         }
                         composable(
                             "profile/{userId}",
