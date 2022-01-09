@@ -4,17 +4,28 @@ import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import com.google.accompanist.pager.ExperimentalPagerApi
 import fhs.mmt.nma.pixie.data.Photographer
 import fhs.mmt.nma.pixie.data.User
@@ -28,6 +39,7 @@ import fhs.mmt.nma.pixie.ui.theme.PixieTheme
 
 @ExperimentalPagerApi
 class MainActivity : ComponentActivity() {
+    @ExperimentalFoundationApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -35,45 +47,58 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background) {
-                    Scaffold(
-                        topBar = {
-                            TopAppBar(title = {
-                                Text(
-                                    "Pixie",
-                                    style = MaterialTheme.typography.h1,
-                                    color = MaterialTheme.colors.onBackground
-                                )
-                            }, backgroundColor = MaterialTheme.colors.surface)
-                        }, bottomBar = { BottomNavigationBar(navController) }, content = {
-                            NavHost(navController = navController, startDestination = "home") {
-                                composable(route = "home") {
+                    NavHost(navController = navController, startDestination = "home") {
+                        composable(route = "home") {
+                            Scaffold(
+                                topBar = {
+                                    TopAppBar(title = {
+                                        Text(
+                                            "Pixie",
+                                            style = MaterialTheme.typography.h1,
+                                            color = MaterialTheme.colors.onBackground
+                                        )
+                                    }, backgroundColor = MaterialTheme.colors.surface)
+                                }, bottomBar = { BottomNavigationBar(navController) }, content = {
                                     HomeScreen(navController)
                                 }
-                                composable(
-                                    "profile/{userId}",
-                                    arguments = listOf(navArgument("userId") { type = NavType.StringType })
-                                ) {
-                                    val userId = it.arguments?.getString("userId")
-                                    ProfileScreen(user = GetUserByIndex(AllUsers, userId!!.toInt()), navController, userId.toString())
-                                }
-                            }
+                            )
                         }
-                    )
+                        composable(
+                            "profile/{userId}",
+                            arguments = listOf(navArgument("userId") { type = NavType.StringType })
+                        ) {
+                            val userId = it.arguments?.getString("userId")
+                            val RealUser = AllUsers.first{ it.id == userId?.toInt() }
+
+                            Scaffold(
+                                topBar = {
+                                    TopAppBar(title = {
+                                        Icon(
+                                            imageVector = Icons.Default.ArrowBack,
+                                            contentDescription = "Back",
+                                            modifier = Modifier
+                                                .size(24.dp)
+                                                .clickable { navController.navigateUp() }
+                                        )
+                                        Text(
+                                            "${RealUser.name}",
+                                            style = MaterialTheme.typography.h1,
+                                            color = MaterialTheme.colors.onBackground,
+                                            modifier = Modifier.padding(start = 16.dp)
+                                        )
+                                    }, backgroundColor = MaterialTheme.colors.surface)
+                                }, content = {
+                                    ProfileScreen(user = RealUser, navController)
+                                }
+                            )
+                        }
+                    }
                 }
             }
         }
     }
 }
 
-fun GetUserByIndex(users : List<Photographer>, userId: Int) : Photographer{
-    var result : Photographer = users[0]
-    users.forEach { user ->
-        if(user.id == userId) {
-            result = user
-        }
-    }
-    return result
-}
 
 @ExperimentalPagerApi
 @Preview
