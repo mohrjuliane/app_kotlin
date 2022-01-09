@@ -63,17 +63,12 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
                         }
-                        composable(route = "instagram", arguments = listOf(navArgument("userId") {type = NavType.StringType}), deepLinks = listOf(
-                            navDeepLink { uriPattern = "httwww.ps://www.instagram.com/{userId}" }
-                        )) { 
-
-                        }
                         composable(
                             "profile/{userId}",
                             arguments = listOf(navArgument("userId") { type = NavType.StringType })
                         ) {
                             val userId = it.arguments?.getString("userId")
-                            val RealUser = GetUserByIndex(AllUsers, userId!!.toInt())
+                            val RealUser = AllUsers.first{ it.id == userId?.toInt() }
 
                             Scaffold(
                                 topBar = {
@@ -104,15 +99,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-fun GetUserByIndex(users : List<Photographer>, userId: Int) : Photographer{
-    var result : Photographer = users[0]
-    users.forEach { user ->
-        if(user.id == userId) {
-            result = user
-        }
-    }
-    return result
-}
 
 @ExperimentalPagerApi
 @Preview

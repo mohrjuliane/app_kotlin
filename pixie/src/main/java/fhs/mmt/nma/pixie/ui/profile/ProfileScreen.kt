@@ -1,6 +1,8 @@
 package fhs.mmt.nma.pixie.ui.profile
 
+import android.content.Intent
 import android.content.res.Configuration
+import android.net.Uri
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
@@ -21,6 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -41,6 +44,7 @@ import fhs.mmt.nma.pixie.ui.theme.PixieTheme
 @ExperimentalFoundationApi
 @Composable
 fun ProfileScreen(user: Photographer, navController: NavController) {
+    val userPosts = AllPosts.filter { it.author.id == user.id }
 
     Column {
         LazyColumn {
@@ -69,15 +73,18 @@ fun ProfileScreen(user: Photographer, navController: NavController) {
                                     CircleShape
                                 )
                         )
-                        val counts = GetCounts(user)
+                        val photos = userPosts.sumOf { it.photos.size }
+                        val likes = userPosts.sumOf { it.likes }
+                        val comments = userPosts.sumOf { it.comments.size }
+
                         Row(
                             horizontalArrangement = Arrangement.SpaceEvenly,
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            ProfileInformationCol(upperText = "${counts[0]}", lowerText = "Likes")
-                            ProfileInformationCol(upperText = "${counts[1]}", lowerText = "Photos")
+                            ProfileInformationCol(upperText = FormatLikes(likes), lowerText = "Likes")
+                            ProfileInformationCol(upperText = "$photos", lowerText = "Photos")
                             ProfileInformationCol(
-                                upperText = "${counts[2]}",
+                                upperText = "$comments",
                                 lowerText = "Comments"
                             )
                         }
@@ -98,14 +105,23 @@ fun ProfileScreen(user: Photographer, navController: NavController) {
             }
         }
 
-        DisplayPosts(user)
+        DisplayPosts(userPosts)
     }
+}
+
+fun FormatLikes(number : Int) : String {
+    var result = ""
+    result = if(number / 1_000_000f > 0) {
+        String.format("%.0fM+", number / 1_000_000f)
+    } else {
+        number.toString()
+    }
+    return result
 }
 
 @ExperimentalFoundationApi
 @Composable
-fun DisplayPosts(user : Photographer) {
-    val posts = AllPosts.filter { post -> post.author == user }
+fun DisplayPosts(posts : List<Post>) {
 
     LazyVerticalGrid(
         cells = GridCells.Fixed(3), modifier = Modifier.padding(top = 16.dp, start = 8.dp, end = 8.dp)
@@ -150,9 +166,13 @@ fun LocationSocialMedia(location : String, socialMedia : String, navController: 
                     .size(24.dp)
                     .padding(end = 8.dp)
             )
+            val context = LocalContext.current
             Text(text = socialMedia, color = MaterialTheme.colors.onBackground, style = MaterialTheme.typography.body1,
                 modifier = Modifier
-                    .clickable { navController.navigate(route = "instagram/$socialMedia") })
+                    .clickable {
+                        val intent = Intent.parseUri("https://www.instagram.com/$socialMedia", 0)
+                        context.startActivity(intent)
+                    })
         }
     }
 }
@@ -164,27 +184,6 @@ fun ProfileInformationCol(upperText : String, lowerText : String) {
     }
 }
 
-fun GetCounts(user : Photographer) : List<String> {
-    var counts = mutableListOf<Int>(0,0,0)
-
-    AllPosts.forEach { post ->
-        if(post.author == user) {
-            counts[0] = counts[0] + post.likes /*count of likes*/
-            counts[1] = counts[1] + post.photos.size /*count of photos*/
-            counts[2] = counts[2] + post.comments.size /*count of comments*/
-        }
-    }
-
-    var result = mutableListOf<String>("${counts[0]}", "${counts[1]}", "${counts[2]}")
-
-    if(counts[0]/1000000 > 0) {
-        val cut = (counts[0] / 1000000).toInt()
-        result[0] = "${cut}M+"
-    }
-
-
-    return result
-}
 
 @ExperimentalFoundationApi
 @Preview
