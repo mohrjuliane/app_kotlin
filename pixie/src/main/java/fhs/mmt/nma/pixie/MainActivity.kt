@@ -71,7 +71,7 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(
                             "profile/{userId}",
-                            arguments = listOf(navArgument("userId") { type = NavType.StringType })
+                            arguments = listOf(navArgument("userId") { type = NavType.IntType })
                         ) {
                             //val userId = it.arguments?.getString("userId")
                             //val RealUser = AllUsers.first{ it.id == userId?.toInt() }
