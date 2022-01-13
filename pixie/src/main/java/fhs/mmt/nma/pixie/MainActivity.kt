@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -19,6 +20,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -33,8 +37,10 @@ import fhs.mmt.nma.pixie.samples.AllUsers
 import fhs.mmt.nma.pixie.samples.FakeUsers
 import fhs.mmt.nma.pixie.samples.providers.UserSampleProvider
 import fhs.mmt.nma.pixie.ui.home.HomeScreen
+import fhs.mmt.nma.pixie.ui.home.HomeViewModel
 import fhs.mmt.nma.pixie.ui.home.isSelected
 import fhs.mmt.nma.pixie.ui.profile.ProfileScreen
+import fhs.mmt.nma.pixie.ui.profile.ProfileViewModel
 import fhs.mmt.nma.pixie.ui.theme.PixieTheme
 
 @ExperimentalPagerApi
@@ -65,32 +71,13 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(
                             "profile/{userId}",
-                            arguments = listOf(navArgument("userId") { type = NavType.StringType })
+                            arguments = listOf(navArgument("userId") { type = NavType.IntType })
                         ) {
-                            val userId = it.arguments?.getString("userId")
-                            val RealUser = AllUsers.first{ it.id == userId?.toInt() }
+                            //val userId = it.arguments?.getString("userId")
+                            //val RealUser = AllUsers.first{ it.id == userId?.toInt() }
+                            val vm : ProfileViewModel = viewModel(it)
+                            ProfileScreen(viewModel = vm, navController = navController)
 
-                            Scaffold(
-                                topBar = {
-                                    TopAppBar(title = {
-                                        Icon(
-                                            imageVector = Icons.Default.ArrowBack,
-                                            contentDescription = "Back",
-                                            modifier = Modifier
-                                                .size(24.dp)
-                                                .clickable { navController.navigateUp() }
-                                        )
-                                        Text(
-                                            "${RealUser.name}",
-                                            style = MaterialTheme.typography.h1,
-                                            color = MaterialTheme.colors.onBackground,
-                                            modifier = Modifier.padding(start = 16.dp)
-                                        )
-                                    }, backgroundColor = MaterialTheme.colors.surface)
-                                }, content = {
-                                    ProfileScreen(user = RealUser, navController)
-                                }
-                            )
                         }
                     }
                 }
