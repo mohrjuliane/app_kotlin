@@ -33,6 +33,7 @@ import androidx.navigation.navDeepLink
 import com.google.accompanist.pager.ExperimentalPagerApi
 import fhs.mmt.nma.pixie.data.Photographer
 import fhs.mmt.nma.pixie.data.User
+import fhs.mmt.nma.pixie.samples.AllPosts
 import fhs.mmt.nma.pixie.samples.AllUsers
 import fhs.mmt.nma.pixie.samples.FakeUsers
 import fhs.mmt.nma.pixie.samples.providers.UserSampleProvider
@@ -65,7 +66,8 @@ class MainActivity : ComponentActivity() {
                                         )
                                     }, backgroundColor = MaterialTheme.colors.surface)
                                 }, bottomBar = { BottomNavigationBar(navController) }, content = {
-                                    HomeScreen(navController)
+                                    val vm : HomeViewModel = viewModel(AllPosts)
+                                    HomeScreen(vm, navController)
                                 }
                             )
                         }

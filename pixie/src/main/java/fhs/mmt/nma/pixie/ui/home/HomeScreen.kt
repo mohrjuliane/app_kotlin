@@ -16,6 +16,8 @@ import fhs.mmt.nma.pixie.ui.theme.PixieTheme
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -39,21 +41,38 @@ fun isSelected(selected: Boolean): Color {
 
 @ExperimentalPagerApi
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(vm: HomeViewModel, navController: NavController) {
 
-    val vm : HomeViewModel = viewModel()
+    val state = vm.uiState.collectAsState().value
+    //launchedEffect, when it, homeffect navigate to user ausfrufen und zum user navigieren
+    //auf button vm.setEvent(Homevent.userProfileclicked)
 
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.background(MaterialTheme.colors.background)) {
+    LaunchedEffect(vm, navController) {
+        state.effect {
+            when (it) {
+                is Effect -> {
+                    Effect.NavigateToUser()
+                    navController.navigate(route = "profile/${author.id}")
+                }
+            }
+        }
+    }
 
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier
-                .background(color = MaterialTheme.colors.background)
-                .padding(start = 8.dp, end = 8.dp)
-        ) {
+    if(state.loading) {
+        CircularProgressIndicator()
+    } else {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.background(MaterialTheme.colors.background)) {
 
-            items(vm.posts) { currentPost ->
-                Card {
-                    PostCard(post = currentPost, navController, onClick = {vm.onUserClicked(currentPost.author, navController)})
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier
+                    .background(color = MaterialTheme.colors.background)
+                    .padding(start = 8.dp, end = 8.dp)
+            ) {
+
+                items(vm.posts) { currentPost ->
+                    Card {
+                        PostCard(post = currentPost, navController, onClick = {vm.setEvent(Event.onUserClicked(currentPost.author.id))})
+                    }
                 }
             }
         }
@@ -67,8 +86,8 @@ fun HomeScreen(navController: NavController) {
 @Composable
 fun HomePreview() {
     PixieTheme {
-
-        HomeScreen(navController = rememberNavController())
+        val vm : HomeViewModel = viewModel()
+        HomeScreen(vm, navController = rememberNavController())
     }
 }
 
