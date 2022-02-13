@@ -10,12 +10,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import fhs.mmt.nma.pixie.data.Post
-import fhs.mmt.nma.pixie.samples.AllPosts
 import fhs.mmt.nma.pixie.ui.theme.PixieTheme
-import androidx.compose.material.Icon
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.graphics.Color
@@ -23,7 +18,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.pager.ExperimentalPagerApi
-import java.nio.channels.spi.AbstractSelectableChannel
+import kotlinx.coroutines.flow.collect
 
 
 
@@ -44,15 +39,12 @@ fun isSelected(selected: Boolean): Color {
 fun HomeScreen(vm: HomeViewModel, navController: NavController) {
 
     val state = vm.uiState.collectAsState().value
-    //launchedEffect, when it, homeffect navigate to user ausfrufen und zum user navigieren
-    //auf button vm.setEvent(Homevent.userProfileclicked)
 
-    LaunchedEffect(vm, navController) {
-        state.effect {
+    LaunchedEffect(key1 = vm, key2 = navController) {
+        vm.effect.collect {
             when (it) {
-                is Effect -> {
-                    Effect.NavigateToUser()
-                    navController.navigate(route = "profile/${author.id}")
+                is Effect.NavigateToUser -> {
+                    navController.navigate(route = "profile/${it.userId}")
                 }
             }
         }
@@ -69,9 +61,9 @@ fun HomeScreen(vm: HomeViewModel, navController: NavController) {
                     .padding(start = 8.dp, end = 8.dp)
             ) {
 
-                items(vm.posts) { currentPost ->
+                items(state.posts) { currentPost ->
                     Card {
-                        PostCard(post = currentPost, navController, onClick = {vm.setEvent(Event.onUserClicked(currentPost.author.id))})
+                        PostCard(post = currentPost, navController, onClick = {vm.setEvent(Event.OnUserClicked(currentPost.author.id))})
                     }
                 }
             }

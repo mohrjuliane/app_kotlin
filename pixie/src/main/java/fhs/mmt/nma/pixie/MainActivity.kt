@@ -4,41 +4,19 @@ import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import androidx.navigation.NavType
+import androidx.navigation.*
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import androidx.navigation.navDeepLink
 import com.google.accompanist.pager.ExperimentalPagerApi
-import fhs.mmt.nma.pixie.data.Photographer
-import fhs.mmt.nma.pixie.data.User
-import fhs.mmt.nma.pixie.samples.AllPosts
-import fhs.mmt.nma.pixie.samples.AllUsers
-import fhs.mmt.nma.pixie.samples.FakeUsers
-import fhs.mmt.nma.pixie.samples.providers.UserSampleProvider
 import fhs.mmt.nma.pixie.ui.home.HomeScreen
-import fhs.mmt.nma.pixie.ui.home.HomeViewModel
 import fhs.mmt.nma.pixie.ui.home.isSelected
 import fhs.mmt.nma.pixie.ui.profile.ProfileScreen
 import fhs.mmt.nma.pixie.ui.profile.ProfileViewModel
@@ -55,7 +33,7 @@ class MainActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background) {
                     NavHost(navController = navController, startDestination = "home") {
-                        composable(route = "home") {
+                        composable(route = "home") { backStack ->
                             Scaffold(
                                 topBar = {
                                     TopAppBar(title = {
@@ -65,9 +43,10 @@ class MainActivity : ComponentActivity() {
                                             color = MaterialTheme.colors.onBackground
                                         )
                                     }, backgroundColor = MaterialTheme.colors.surface)
-                                }, bottomBar = { BottomNavigationBar(navController) }, content = {
-                                    val vm : HomeViewModel = viewModel(AllPosts)
-                                    HomeScreen(vm, navController)
+                                },
+                                bottomBar = { BottomNavigationBar(navController) },
+                                content = {
+                                    HomeScreen(vm = viewModel(backStack), navController)
                                 }
                             )
                         }
@@ -75,11 +54,8 @@ class MainActivity : ComponentActivity() {
                             "profile/{userId}",
                             arguments = listOf(navArgument("userId") { type = NavType.IntType })
                         ) {
-                            //val userId = it.arguments?.getString("userId")
-                            //val RealUser = AllUsers.first{ it.id == userId?.toInt() }
                             val vm : ProfileViewModel = viewModel(it)
                             ProfileScreen(viewModel = vm, navController = navController)
-
                         }
                     }
                 }
