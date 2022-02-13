@@ -2,7 +2,6 @@ package fhs.mmt.nma.pixie.ui.profile
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import fhs.mmt.nma.pixie.data.Photographer
 import fhs.mmt.nma.pixie.data.Post
 import fhs.mmt.nma.pixie.samples.AllPosts
 import fhs.mmt.nma.pixie.samples.AllUsers
